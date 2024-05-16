@@ -46,6 +46,9 @@ typedef enum {
     OP_GET_LIST,
     OP_SET_LIST,
     OP_MOD,
+    OP_BAND,
+    OP_BXOR,
+    OP_SHR,
 } OpCode;
 
 typedef struct {

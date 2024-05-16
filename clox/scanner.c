@@ -166,6 +166,16 @@ static Token string(void) {
     return make_token(TOKEN_STRING);
 }
 
+static Token greater(void) {
+    if (match('=')) {
+        return make_token(TOKEN_GREATER_EQUAL);
+    } else if (match('>')) {
+        return make_token(TOKEN_GREATER_GREATER);
+    } else {
+        return make_token(TOKEN_GREATER);
+    }
+}
+
 Token scan_token(void) {
     skip_whitespace();
     scanner.start = scanner.current;
@@ -192,11 +202,13 @@ Token scan_token(void) {
         case '!': return make_token(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
         case '=': return make_token(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
         case '<': return make_token(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
-        case '>': return make_token(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+        case '>': return greater();
         case '"': return string();
         case '[': return make_token(TOKEN_LEFT_SQUARE_BRACKET);
         case ']': return make_token(TOKEN_RIGHT_SQUARE_BRACKET);
-        case '%': return make_token(TOKEN_MOD);
+        case '%': return make_token(TOKEN_PERCENT);
+        case '&': return make_token(TOKEN_AMPERSAND);
+        case '~': return make_token(TOKEN_TILDE);
     }
     
     return error_token("Unexpected character.");

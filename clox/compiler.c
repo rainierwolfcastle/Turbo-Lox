@@ -25,6 +25,9 @@ typedef enum {
     PREC_AND,
     PREC_EQUALITY,
     PREC_COMPARISION,
+    PREC_BXOR,
+    PREC_BAND,
+    PREC_BITWISE_SHIFT,
     PREC_TERM,
     PREC_FACTOR,
     PREC_UNARY,
@@ -402,17 +405,20 @@ static void binary(bool can_assign) {
     parse_precedence((Precedence) (rule->precedence + 1));
     
     switch (operator_type) {
-        case TOKEN_BANG_EQUAL:    emit_bytes(OP_EQUAL, OP_NOT); break;
-        case TOKEN_EQUAL_EQUAL:   emit_byte(OP_EQUAL); break;
-        case TOKEN_GREATER:       emit_byte(OP_GREATER); break;
-        case TOKEN_GREATER_EQUAL: emit_bytes(OP_LESS, OP_NOT); break;
-        case TOKEN_LESS:          emit_byte(OP_LESS); break;
-        case TOKEN_LESS_EQUAL:    emit_bytes(OP_GREATER, OP_NOT); break;
-        case TOKEN_PLUS:          emit_byte(OP_ADD); break;
-        case TOKEN_MINUS:         emit_byte(OP_SUBTRACT); break;
-        case TOKEN_STAR:          emit_byte(OP_MULTIPLY); break;
-        case TOKEN_SLASH:         emit_byte(OP_DIVIDE); break;
-        case TOKEN_MOD:           emit_byte(OP_MOD); break;
+        case TOKEN_BANG_EQUAL:      emit_bytes(OP_EQUAL, OP_NOT); break;
+        case TOKEN_EQUAL_EQUAL:     emit_byte(OP_EQUAL); break;
+        case TOKEN_GREATER:         emit_byte(OP_GREATER); break;
+        case TOKEN_GREATER_EQUAL:   emit_bytes(OP_LESS, OP_NOT); break;
+        case TOKEN_LESS:            emit_byte(OP_LESS); break;
+        case TOKEN_LESS_EQUAL:      emit_bytes(OP_GREATER, OP_NOT); break;
+        case TOKEN_PLUS:            emit_byte(OP_ADD); break;
+        case TOKEN_MINUS:           emit_byte(OP_SUBTRACT); break;
+        case TOKEN_STAR:            emit_byte(OP_MULTIPLY); break;
+        case TOKEN_SLASH:           emit_byte(OP_DIVIDE); break;
+        case TOKEN_PERCENT:         emit_byte(OP_MOD); break;
+        case TOKEN_AMPERSAND:       emit_byte(OP_BAND); break;
+        case TOKEN_TILDE:           emit_byte(OP_BXOR); break;
+        case TOKEN_GREATER_GREATER: emit_byte(OP_SHR); break;
         default: return; // unreachable
     }
 }
@@ -618,7 +624,10 @@ ParseRule rules[] = {
     [TOKEN_EOF]                  = {NULL,        NULL,      PREC_NONE},
     [TOKEN_LEFT_SQUARE_BRACKET]  = {list,        subscript, PREC_CALL},
     [TOKEN_RIGHT_SQUARE_BRACKET] = {NULL,        NULL,      PREC_NONE},
-    [TOKEN_MOD]                  = {NULL,        binary,    PREC_TERM},
+    [TOKEN_PERCENT]              = {NULL,        binary,    PREC_TERM},
+    [TOKEN_AMPERSAND]            = {NULL,        binary,    PREC_BAND},
+    [TOKEN_TILDE]                = {NULL,        binary,    PREC_BXOR},
+    [TOKEN_GREATER_GREATER]      = {NULL,        binary,    PREC_BITWISE_SHIFT},
 };
 
 static void parse_precedence(Precedence precedence) {
