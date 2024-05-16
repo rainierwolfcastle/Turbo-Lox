@@ -551,6 +551,36 @@ static InterpretResult run(void) {
                 push(NUMBER_VAL(fmod(a, b)));
                 break;
             }
+            case OP_BAND: {
+                if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
+                    runtime_error("Operands must be numbers.");
+                    return INTERPRET_RUNTIME_ERROR; \
+                }
+                uint32_t b = AS_NUMBER(pop());
+                uint32_t a = AS_NUMBER(pop());
+                push(NUMBER_VAL(a & b));
+                break;
+            }
+            case OP_BXOR: {
+                if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
+                    runtime_error("Operands must be numbers.");
+                    return INTERPRET_RUNTIME_ERROR; \
+                }
+                uint32_t b = AS_NUMBER(pop());
+                uint32_t a = AS_NUMBER(pop());
+                push(NUMBER_VAL(a ^ b));
+                break;
+            }
+            case OP_SHR: {
+                if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
+                    runtime_error("Operands must be numbers.");
+                    return INTERPRET_RUNTIME_ERROR; \
+                }
+                uint32_t b = AS_NUMBER(pop());
+                uint32_t a = AS_NUMBER(pop());
+                push(NUMBER_VAL(a >> b));
+                break;
+            }
         }
     }
 

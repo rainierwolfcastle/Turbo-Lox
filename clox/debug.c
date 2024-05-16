@@ -153,6 +153,12 @@ int disassemble_instruction(Chunk *chunk, int offset) {
             return simple_instruction("OP_SET_LIST", offset);
         case OP_MOD:
             return simple_instruction("OP_MOD", offset);
+        case OP_BAND:
+            return simple_instruction("OP_BAND", offset);
+        case OP_BXOR:
+            return simple_instruction("OP_BXOR", offset);
+        case OP_SHR:
+            return simple_instruction("OP_SHR", offset);
         default:
             printf("Unknown opcode %d\n", instruction);
             return offset + 1;
