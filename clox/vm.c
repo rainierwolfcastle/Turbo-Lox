@@ -259,6 +259,32 @@ static void concatinate(void) {
     push(OBJ_VAL(result));
 }
 
+static bool validate_num(Value arg, const char *arg_name) {
+    if (IS_NUMBER(arg)) return true;
+    runtime_error("%s must be a number.", arg_name);
+    return false;
+}
+
+static bool validate_int_value(double value, const char *arg_name) {
+    if (trunc(value) == value) return true;
+    runtime_error("%s must be an integer.", arg_name);
+    return false;
+}
+
+static uint32_t validate_index_value(uint32_t count, double value, const char *arg_name) {
+    if (!validate_int_value(value, arg_name)) return UINT32_MAX;
+
+    if (value >= 0 && value < count) return (uint32_t) value;
+
+    runtime_error("%s out of bounds.", arg_name);
+    return UINT32_MAX;
+}
+
+static uint32_t validate_index(Value arg, uint32_t count, const char *arg_name) {
+    if (!validate_num(arg, arg_name)) return UINT32_MAX;
+    return validate_index_value(count, AS_NUMBER(arg), arg_name);
+}
+
 static InterpretResult run(void) {
     CallFrame *frame = &vm.frames[vm.frame_count - 1];
     
@@ -518,33 +544,44 @@ static InterpretResult run(void) {
             case OP_METHOD:
                 define_method(READ_STRING());
                 break;
-            case OP_NEW_LIST:
-                push(OBJ_VAL(new_list()));
+            case OP_NEW_LIST: {
+                ObjList *list = new_list();
+
+                uint8_t count = (uint8_t) AS_NUMBER(pop());
+                for (uint8_t i = 0; i < count; i++) {
+                    write_value_array(&list->elements, pop());
+                }
+
+                push(OBJ_VAL(list));
                 break;
+            }
             case OP_GET_LIST: {
-                int index = (int) AS_NUMBER(pop());
+                Value index_value = pop();
                 ObjList *list = AS_LIST(pop());
+
+                uint32_t index = validate_index(index_value, list->elements.count, "Subscript");
+                if (index == UINT32_MAX) return INTERPRET_RUNTIME_ERROR;
+
                 push(list->elements.values[index]);
                 break;
             }
             case OP_SET_LIST: {
-                Value value = pop();
-                int index = (int) AS_NUMBER(pop());
+                Value list_value = pop();
+                Value index_value = pop();
                 ObjList *list = AS_LIST(pop());
-                
-                if (index < list->elements.count) {
-                    list->elements.values[index] = value;
-                } else {
-                    write_value_array(&list->elements, value);
-                }
-                
+
+                uint32_t index = validate_index(index_value, list->elements.count, "Subscript");
+                if (index == UINT32_MAX) return INTERPRET_RUNTIME_ERROR;
+
+                list->elements.values[index] = list_value;
+
                 push(OBJ_VAL(list));
                 break;
             }
             case OP_MOD: {
                 if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
                     runtime_error("Operands must be numbers.");
-                    return INTERPRET_RUNTIME_ERROR; \
+                    return INTERPRET_RUNTIME_ERROR;
                 }
                 double b = AS_NUMBER(pop());
                 double a = AS_NUMBER(pop());
@@ -554,7 +591,7 @@ static InterpretResult run(void) {
             case OP_BAND: {
                 if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
                     runtime_error("Operands must be numbers.");
-                    return INTERPRET_RUNTIME_ERROR; \
+                    return INTERPRET_RUNTIME_ERROR;
                 }
                 uint32_t b = AS_NUMBER(pop());
                 uint32_t a = AS_NUMBER(pop());
@@ -564,7 +601,7 @@ static InterpretResult run(void) {
             case OP_BXOR: {
                 if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
                     runtime_error("Operands must be numbers.");
-                    return INTERPRET_RUNTIME_ERROR; \
+                    return INTERPRET_RUNTIME_ERROR;
                 }
                 uint32_t b = AS_NUMBER(pop());
                 uint32_t a = AS_NUMBER(pop());
@@ -574,7 +611,7 @@ static InterpretResult run(void) {
             case OP_SHR: {
                 if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
                     runtime_error("Operands must be numbers.");
-                    return INTERPRET_RUNTIME_ERROR; \
+                    return INTERPRET_RUNTIME_ERROR;
                 }
                 uint32_t b = AS_NUMBER(pop());
                 uint32_t a = AS_NUMBER(pop());

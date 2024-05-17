@@ -454,15 +454,16 @@ static void literal(bool can_assign) {
 }
 
 static void list(bool can_assign) {
-    emit_byte(OP_NEW_LIST);
-
-    double index = 0;
+    uint8_t count = 0;
     do {
         if (check(TOKEN_RIGHT_SQUARE_BRACKET)) break;
-        emit_constant(NUMBER_VAL(index++));
+        if (count == UINT8_MAX) error("Can't have more than 255 elements.");
         expression();
-        emit_byte(OP_SET_LIST);
+        count++;
     } while (match(TOKEN_COMMA));
+
+    emit_constant(NUMBER_VAL(count));
+    emit_byte(OP_NEW_LIST);
 
     consume(TOKEN_RIGHT_SQUARE_BRACKET, "Expect ']' after list elements.");
 }
