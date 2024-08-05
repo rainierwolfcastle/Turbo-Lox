@@ -1,0 +1,45 @@
+class Tree {
+  init(item, depth) {
+    this._item = item;
+    this._left = nil;
+    this._right = nil;
+
+    if (depth > 0) {
+      var item2 = item + item;
+      depth = depth - 1;
+      this._left = Tree(item2 - 1, depth);
+      this._right = Tree(item2, depth);
+    }
+  }
+
+  check() {
+    if (this._left == nil) {
+      return this._item;
+    }
+
+    return (this._item + this._left.check()) - this._right.check();
+  }
+}
+
+var min_depth = 4;
+var max_depth = 12;
+var stretch_depth = max_depth + 1;
+
+var long_lived_tree = Tree(0, max_depth);
+
+var iterations = 1;
+for (var d = 0; d < max_depth; d = d + 1) {
+  iterations = iterations * 2;
+}
+
+var depth = min_depth;
+
+while (depth < stretch_depth) {
+  var check = 0;
+  for (var i = 0; i < iterations; i = i + 1) {
+    check = (check + Tree(i, depth).check()) + Tree(-i, depth).check();
+  }
+
+  iterations = iterations / 4;
+  depth = depth + 2;
+}
