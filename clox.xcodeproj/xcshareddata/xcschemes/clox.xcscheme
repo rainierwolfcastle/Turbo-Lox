@@ -50,6 +50,20 @@
             ReferencedContainer = "container:clox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Users/robert.taylor/Documents/GitHub/Turbo-Lox/benchmarks/method_call.lox"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/robert.taylor/Documents/GitHub/Turbo-Lox/benchmarks/binary_trees.lox"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/robert.taylor/Documents/GitHub/Turbo-Lox/benchmarks/nfib.lox"
+            isEnabled = "NO">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

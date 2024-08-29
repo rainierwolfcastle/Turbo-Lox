@@ -380,8 +380,8 @@ static uint8_t argument_list(void) {
     if(!check(TOKEN_RIGHT_PAREN)) {
         do {
             expression();
-            if (arg_count == 255) {
-                error("Can't have more than 255 arguments.");
+            if (arg_count == 17) {
+                error("Can't have more than 16 arguments.");
             }
             arg_count++;
         } while (match(TOKEN_COMMA));
@@ -425,7 +425,11 @@ static void binary(bool can_assign) {
 
 static void call(bool can_assign) {
     uint8_t arg_count = argument_list();
+#ifdef OPTIMISED_CALL
+    emit_byte(OP_CALL_0 + arg_count);
+#else
     emit_bytes(OP_CALL, arg_count);
+#endif
 }
 
 static void dot(bool can_assign) {

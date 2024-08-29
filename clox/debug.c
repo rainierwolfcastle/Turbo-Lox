@@ -113,6 +113,40 @@ int disassemble_instruction(Chunk *chunk, int offset) {
             return jump_instruction("OP_JUMP_IF_FALSE", 1, chunk, offset);
         case OP_LOOP:
             return jump_instruction("OP_LOOP", -1, chunk, offset);
+        case OP_CALL_0:
+            return simple_instruction("OP_CALL_0", offset);
+        case OP_CALL_1:
+            return simple_instruction("OP_CALL_1", offset);
+        case OP_CALL_2:
+            return simple_instruction("OP_CALL_2", offset);
+        case OP_CALL_3:
+            return simple_instruction("OP_CALL_3", offset);
+        case OP_CALL_4:
+            return simple_instruction("OP_CALL_4", offset);
+        case OP_CALL_5:
+            return simple_instruction("OP_CALL_5", offset);
+        case OP_CALL_6:
+            return simple_instruction("OP_CALL_6", offset);
+        case OP_CALL_7:
+            return simple_instruction("OP_CALL_7", offset);
+        case OP_CALL_8:
+            return simple_instruction("OP_CALL_8", offset);
+        case OP_CALL_9:
+            return simple_instruction("OP_CALL_9", offset);
+        case OP_CALL_10:
+            return simple_instruction("OP_CALL_10", offset);
+        case OP_CALL_11:
+            return simple_instruction("OP_CALL_11", offset);
+        case OP_CALL_12:
+            return simple_instruction("OP_CALL_12", offset);
+        case OP_CALL_13:
+            return simple_instruction("OP_CALL_13", offset);
+        case OP_CALL_14:
+            return simple_instruction("OP_CALL_14", offset);
+        case OP_CALL_15:
+            return simple_instruction("OP_CALL_15", offset);
+        case OP_CALL_16:
+            return simple_instruction("OP_CALL_16", offset);
         case OP_CALL:
             return byte_instruction("OP_CALL", chunk, offset);
         case OP_INVOKE:

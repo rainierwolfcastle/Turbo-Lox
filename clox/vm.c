@@ -121,6 +121,8 @@ static bool call(ObjClosure *closure, int arg_count) {
 }
 
 static bool call_value(Value callee, int arg_count) {
+    printf("%% %d\n", arg_count);
+    
     if (IS_OBJ(callee)) {
         switch (OBJ_TYPE(callee)) {
             case OBJ_BOUND_METHOD: {
@@ -638,6 +640,8 @@ static InterpretResult run(void) {
     register CallFrame *frame = &vm.frames[vm.frame_count - 1];
     register uint8_t *ip = frame->ip;
 
+    OpCode instruction;
+
 #define PUSH(value) (*vm.stack_top++ = value)
 #define POP() (*(--vm.stack_top))
 #define PEEK() (vm.stack_top[-1])
@@ -704,6 +708,23 @@ static InterpretResult run(void) {
         &&OP_JUMP,
         &&OP_JUMP_IF_FALSE,
         &&OP_LOOP,
+        &&OP_CALL_0,
+        &&OP_CALL_1,
+        &&OP_CALL_2,
+        &&OP_CALL_3,
+        &&OP_CALL_4,
+        &&OP_CALL_5,
+        &&OP_CALL_6,
+        &&OP_CALL_7,
+        &&OP_CALL_8,
+        &&OP_CALL_9,
+        &&OP_CALL_10,
+        &&OP_CALL_11,
+        &&OP_CALL_12,
+        &&OP_CALL_13,
+        &&OP_CALL_14,
+        &&OP_CALL_15,
+        &&OP_CALL_16,
         &&OP_CALL,
         &&OP_INVOKE,
         &&OP_SUPER_INVOKE,
@@ -725,7 +746,7 @@ static InterpretResult run(void) {
 #define DISPATCH() \
     do { \
         DTI_DEBUG_TRACE_EXECUTION(); \
-        goto *dispatchTable[READ_BYTE()]; \
+        goto *dispatchTable[instruction = (OpCode) READ_BYTE()]; \
     } while (false)
 
     DISPATCH();
@@ -914,6 +935,32 @@ OP_JUMP_IF_FALSE: {
 OP_LOOP: {
     uint16_t offset = READ_SHORT();
     ip -= offset;
+    DISPATCH();
+}
+OP_CALL_0:
+OP_CALL_1:
+OP_CALL_2:
+OP_CALL_3:
+OP_CALL_4:
+OP_CALL_5:
+OP_CALL_6:
+OP_CALL_7:
+OP_CALL_8:
+OP_CALL_9:
+OP_CALL_10:
+OP_CALL_11:
+OP_CALL_12:
+OP_CALL_13:
+OP_CALL_14:
+OP_CALL_15:
+OP_CALL_16: {
+    int arg_count = instruction - OP_CALL_0;
+    STORE_FRAME();
+    if (!call_value(peek(arg_count), arg_count)) {
+        return INTERPRET_RUNTIME_ERROR;
+    }
+    frame = &vm.frames[vm.frame_count - 1];
+    LOAD_FRAME();
     DISPATCH();
 }
 OP_CALL: {
